@@ -1,20 +1,15 @@
-# real_time_detection.py
-
 import os
 import cv2
 import numpy as np
 from tensorflow.keras.models import load_model
 
-#  Paths 
 base_dir = os.path.dirname(os.path.abspath(__file__))
 model_path = os.path.join(base_dir, "emotion_model1.keras")
-train_dir = os.path.join(base_dir, "train")  # Needed for labels
+train_dir = os.path.join(base_dir, "train")  
 emotion_labels = os.listdir(train_dir)
 
-#Load Model
 model = load_model(model_path)
 
-#Face Detection
 face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 img_size = 48
 
