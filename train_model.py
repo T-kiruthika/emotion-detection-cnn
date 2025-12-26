@@ -1,27 +1,21 @@
-# train_model.py
-
 import os
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras import layers, models
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
-
-# Paths 
+ 
 base_dir = os.path.dirname(os.path.abspath(__file__))
 
 train_dir = os.path.join(base_dir, "train")
 val_dir = os.path.join(base_dir, "validation")
 test_dir = os.path.join(base_dir, "test")
-model_path = os.path.join(base_dir, "emotion_model1.keras")  # .keras format
-model_h5_path = os.path.join(base_dir, "emotion_model1.h5")  # optional .h5 format
-
-#Parameters
+model_path = os.path.join(base_dir, "emotion_model1.keras") 
+model_h5_path = os.path.join(base_dir, "emotion_model1.h5")  
 img_size = 48
 batch_size = 32
 emotion_labels = os.listdir(train_dir)
 
-#Data Preprocessing
 datagen = ImageDataGenerator(
     rescale=1./255,
     rotation_range=20,
@@ -56,8 +50,7 @@ test_data = datagen.flow_from_directory(
     class_mode='categorical',
     color_mode='grayscale'
 )
-
-#Model Architecture 
+ 
 model = models.Sequential([
     layers.Conv2D(32, (3, 3), activation='relu', input_shape=(img_size, img_size, 1)),
     layers.BatchNormalization(),
@@ -86,11 +79,9 @@ model.compile(
     metrics=['accuracy']
 )
 
-# Callbacks
 early_stop = EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True)
 checkpoint = ModelCheckpoint(model_path, save_best_only=True)
 
-#Training
 model.fit(
     train_data,
     validation_data=val_data,
@@ -98,15 +89,11 @@ model.fit(
     callbacks=[early_stop, checkpoint]
 )
 
-# Evaluation
 loss, accuracy = model.evaluate(test_data)
 print(f"Test Loss: {loss:.4f}, Test Accuracy: {accuracy:.4f}")
 
-# Save model 
-# Save in .keras format (already done via checkpoint)
 model.save(model_path)
 print(f"Model saved at {model_path}")
 
-# Optional: Save as .h5 as well
 model.save(model_h5_path)
 print(f"Model also saved as H5 at {model_h5_path}")
